@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Страница</title>
+
+    <body>
+      <h1>Змейка</h1>
+      <p>для управления нажимай клавиши "вправо", "влево".</p>
+      <form>
+        <input
+          type="button"
+          value="а теперь давай поиграем?"
+          onClick="funcGameGo()"
+        />
+      </form>
+      <img id="image1" src="fon.jpg" style="display: none" />
+      <img id="image2" src="vodka.jpg" style="display: none" />
+      <img id="image3" src="5but.jpg" style="display: none" />
+      <canvas id="canvas" width="720" height="700"></canvas>
+      <script>
+        var img1 = document.getElementById("image1");
+        var img2 = document.getElementById("image2");
+        var img3 = document.getElementById("image3");
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        let pahom = [300, 680];
+        let vodka = [[340, 200]];
+        let movementGo = null;
+        let point = 0;
+        let loose = 0;
+        let speed = 80;
+        function sound1() {
+          let audio = new Audio();
+          audio.src = "vodka.mp3";
+          audio.autoplay = true;
+        }
+        function sound2() {
+          let audio = new Audio();
+          audio.src = "bulk.mp3";
+          audio.autoplay = true;
+        }
+        let movement = function (a) {
+          //клавиши
+          if (a.keyCode == 39) {
+            if (pahom[0] != 600) {
+              pahom[0] = pahom[0] + 30;
+            }
+          }
+          if (a.keyCode == 37) {
+            if (pahom[0] != 0) {
+              pahom[0] = pahom[0] - 30;
+            }
+          }
+        };
+        let ramka = function () {
+          ctx.beginPath();
+          ctx.strokeRect(0, 0, 720, 700);
+          ctx.beginPath();
+          /*ctx.drawImage(img1, 0, 0, 720, 700);
+          ctx.beginPath();*/
+          ctx.fillStyle = "rgb(240, 244, 247)";
+          ctx.arc(50, 50, 50, 0, Math.PI * 2, false);
+          ctx.closePath();
+          ctx.fill();
+          ctx.fillStyle = "rgb(240, 244, 247)";
+          ctx.arc(650, 50, 50, 0, Math.PI * 2, false);
+          ctx.closePath();
+          ctx.fill();
+          ctx.font = "10pt Comic Sans MS";
+          ctx.fillStyle = "black";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("Очки:", 50, 40);
+          ctx.fillStyle = "blue";
+          ctx.fillText(point, 50, 60);
+          ctx.fillStyle = "red";
+          ctx.fillText("разбитые", 650, 35);
+          ctx.fillText("бутылки:", 650, 45);
+          ctx.fillText(loose, 650, 60);
+          ctx.shadowOffsetX = -3;
+          ctx.shadowOffsetY = 3;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = "gray";
+        };
+        let randomIntegerX = function (min, max) {
+          let rand = min - 0.5 + Math.random() * (max - min + 1);
+          return 10 * Math.round(rand);
+        };
+        let posXVodka = function () {
+          vodka = [[randomIntegerX(2, 67), 100]];
+        };
+        function gameOver() {
+          clearInterval(gameGo);
+          ctx.clearRect(0, 0, 720, 700);
+          ctx.drawImage(img3, 0, 0, 720, 700);
+          let xPos = canvas.width / 2;
+          ctx.font = "60pt Comic Sans MS";
+          ctx.fillStyle = "red";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("ПЯЯЯЯТЬ!!!", xPos, 200);
+          ctx.font = "40pt Comic Sans MS";
+          ctx.fillText("ПЯЯЯЯЯТЬ БУТЫЛОК", xPos, 400);
+          ctx.fillText("ВОДКИ...", xPos, 500);
+        }
+        let levelUp = function (a) {
+          if (a == 2) {
+            clearInterval(gameGo);
+            speed = 70;
+            funcGameGo();
+          }
+          if (a == 3) {
+            clearInterval(gameGo);
+            speed = 50;
+            funcGameGo();
+          }
+          if (a == 4) {
+            clearInterval(gameGo);
+            speed = 35;
+            funcGameGo();
+          }
+          if (a == 5) {
+            clearInterval(gameGo);
+            speed = 25;
+            funcGameGo();
+          }
+        };
+
+        let game = function () {
+          ctx.clearRect(0, 0, 720, 700); //все поле стирается
+          ramka(); //создается рамка
+          ctx.beginPath();
+          ctx.strokeRect(pahom[0], pahom[1], 120, 20); //пахом
+          ctx.beginPath();
+          ctx.beginPath();
+          ctx.drawImage(img2, vodka[0][0], vodka[0][1], 30, 100); //бутылка
+          ctx.beginPath();
+          let movement = (function () {
+            vodka.unshift([vodka[0][0], vodka[0][1] + 20]);
+            vodka.pop();
+          })();
+          if (
+            vodka[0][0] >= pahom[0] &&
+            vodka[0][0] <= pahom[0] + 100 &&
+            vodka[0][1] == 680
+          ) {
+            point += 100;
+            posXVodka();
+            sound2();
+            if (point == 1000) {
+              levelUp(2);
+            }
+            if (point == 2000) {
+              levelUp(3);
+            }
+            if (point == 3000) {
+              levelUp(4);
+            }
+            if (point == 4000) {
+              levelUp(5);
+            }
+            if (point == 5000) {
+              levelUp(6);
+            }
+          } else if (vodka[0][1] == 680) {
+            posXVodka();
+            loose += 1;
+            if (loose == 5) {
+              gameOver();
+            }
+            sound1();
+          }
+        };
+        document.addEventListener("keydown", movement);
+        let gameGo;
+        let funcGameGo = function () {
+          gameGo = setInterval(game, speed);
+        };
+      </script>
+    </body>
+  </head>
+</html>
