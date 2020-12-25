@@ -92,6 +92,9 @@
           vodka = [[randomIntegerX(2, 67), 100]];
         };
         function gameOver() {
+          point = 0;
+          speed = 80;
+          loose = 0;
           clearInterval(gameGo);
           ctx.clearRect(0, 0, 720, 700);
           ctx.drawImage(img3, 0, 0, 720, 700);
